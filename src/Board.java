@@ -4,13 +4,29 @@ public class Board {
 	/** The spaces that make up our game board. */
 	public Space[][] spaces;
 
-	public void reset() {
+	/**
+	 * Resets the board and recreates all the spaces.
+	 * @param game The game that owns the board.
+	 */
+	public void reset(Game game) {
+		// Remove all spaces from the spacePanel that we had before
+		if (spaces != null) {
+			for (int y = 0; y < SIZE; y++) {
+				for (int x = 0; x < SIZE; x++) {
+					game.spacePanel.remove(spaces[x][y]);
+				}
+			}
+		}
+
 		spaces = new Space[SIZE][SIZE];
 		
 		for (int y = 0; y < SIZE; y++) {
 			for (int x = 0; x < SIZE; x++) {
 				Space space = new Space(x, y);
 				spaces[x][y] = space;
+				game.spacePanel.add(space);
+				game.spacePanel.setComponentZOrder(space, 0);
+				space.addActionListener(game::onSpacePressed);
 			}
 		}
 	}
@@ -55,9 +71,7 @@ public class Board {
 	private boolean isRowControlled(int row) {
 		if (spaces[0][row].state == spaces[1][row].state) {
 			if (spaces[2][row].state == spaces[1][row].state) {
-				if (spaces[1][row].state != SpaceState.Empty) {
-					return true;
-				}
+				return spaces[1][row].state != SpaceState.Empty;
 			}
 		}
 
@@ -67,9 +81,7 @@ public class Board {
 	private boolean isColumnControlled(int column) {
 		if (spaces[column][0].state == spaces[column][1].state) {
 			if (spaces[column][2].state == spaces[column][1].state) {
-				if (spaces[column][1].state != SpaceState.Empty) {
-					return true;
-				}
+				return spaces[column][1].state != SpaceState.Empty;
 			}
 		}
 
@@ -79,9 +91,7 @@ public class Board {
 	private boolean isUpDiagonalControlled() {
 		if (spaces[1][1].state == spaces[0][2].state) {
 			if (spaces[1][1].state == spaces[2][0].state) {
-				if (spaces[1][1].state != SpaceState.Empty) {
-					return true;
-				}
+				return spaces[1][1].state != SpaceState.Empty;
 			}
 		}
 
@@ -91,9 +101,7 @@ public class Board {
 	private boolean isDownDiagonalControlled() {
 		if (spaces[1][1].state == spaces[0][0].state) {
 			if (spaces[1][1].state == spaces[2][2].state) {
-				if (spaces[1][1].state != SpaceState.Empty) {
-					return true;
-				}
+				return spaces[1][1].state != SpaceState.Empty;
 			}
 		}
 
