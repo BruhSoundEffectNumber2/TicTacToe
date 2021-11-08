@@ -1,5 +1,0 @@
-1,Tim,8
-2,Sue,7
-3,Jack,7
-4,Damon,3
-5,Bill,1

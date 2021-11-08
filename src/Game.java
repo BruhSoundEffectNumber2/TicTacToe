@@ -56,6 +56,7 @@ public class Game implements Runnable {
         switch (space.state) {
             case Player1 -> space.setText("X");
             case Player2 -> space.setText("O");
+            case Empty -> space.setText("");
         }
 
         // Check if won
@@ -68,6 +69,7 @@ public class Game implements Runnable {
                         "They have won " + currentPlayer.timesWon + " times." +
                         " Click me to have another game!"
                 );
+                leaderboard.updateScores(players);
             }
             case 3 -> infoButton.setText("The game is a draw!" +
                     " Click me to have another game!"
@@ -119,13 +121,6 @@ public class Game implements Runnable {
         spacePanel.setLayout(new GridLayout(3, 3));
         gamePanel.add(spacePanel, BorderLayout.PAGE_START);
 
-        // Create a nameField to get the player's names
-        JTextField nameField = new JTextField(6);
-        nameField.setPreferredSize(
-                new Dimension(160, 40)
-        );
-        //mainFrame.add(nameField, BorderLayout.PAGE_START);
-
         // Create infoButton to show information to player,
         // as well as to allow them to have more than 1 game
         infoButton = new JButton();
@@ -134,8 +129,6 @@ public class Game implements Runnable {
         );
         infoButton.addActionListener(this::onInfoButtonPressed);
         gamePanel.add(infoButton, BorderLayout.PAGE_END);
-
-        JOptionPane.showMessageDialog(mainFrame, "Hello");
 
         // Create leaderboard
         leaderboard = new Leaderboard();
@@ -148,12 +141,30 @@ public class Game implements Runnable {
         );
         mainFrame.add(leaderboard, BorderLayout.LINE_END);
 
-        isGameRunning = true;
         resetGame();
         updateInfoButtonCurrentPlayer();
 
         mainFrame.pack();
         mainFrame.setVisible(true);
+
+        getPlayerName(players[0]);
+        getPlayerName(players[1]);
+        isGameRunning = true;
+    }
+
+    private void getPlayerName(Player p) {
+        while (true) {
+            String input = (String)JOptionPane.showInputDialog(
+                mainFrame, 
+                "Player " + p.visualID + ". What is your name? (Max 6 letters)",
+                "Enter Your Name"
+            );
+
+            if (input != null && input.length() > 0 && input.length() <= 6) {
+                p.name = input;
+                break;
+            }
+        }
     }
 
     /** Causes the infoButton to change its text to show which player is currently acting. */
