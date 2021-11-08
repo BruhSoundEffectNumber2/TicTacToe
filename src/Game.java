@@ -6,11 +6,15 @@ import java.awt.event.ActionEvent;
 public class Game implements Runnable {
     public static final int SPACE_SIZE = 200;
     public static final int INFO_BUTTON_HEIGHT = 20;
+    public static final int LEADERBOARD_WIDTH = 180;
+    public static final int NAME_FIELD_HEIGHT = 40;
 
     private final Board board;
     private final Player[] players;
 
-    public JLayeredPane spacePanel;
+    public Leaderboard leaderboard;
+    public JPanel gamePanel;
+    public JPanel spacePanel;
     public JFrame mainFrame;
     public JButton infoButton;
     private Player currentPlayer;
@@ -87,30 +91,62 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
+        // TODO: Put the creation of the various components into separate functions
         // Create mainFrame to serve as base
         mainFrame = new JFrame("TicTacToe");
         mainFrame.getContentPane().setPreferredSize(
-                new Dimension(SPACE_SIZE * Board.SIZE, (SPACE_SIZE * Board.SIZE) + INFO_BUTTON_HEIGHT)
+                new Dimension(
+                        SPACE_SIZE * Board.SIZE + LEADERBOARD_WIDTH,
+                        SPACE_SIZE * Board.SIZE + INFO_BUTTON_HEIGHT
+                )
         );
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setLayout(new BorderLayout());
 
+        // Create gamePanel to hold game panels
+        gamePanel = new JPanel();
+        gamePanel.setLayout(new BorderLayout());
+        gamePanel.setPreferredSize(
+                new Dimension(SPACE_SIZE * Board.SIZE, SPACE_SIZE * Board.SIZE + INFO_BUTTON_HEIGHT)
+        );
+        mainFrame.add(gamePanel, BorderLayout.LINE_START);
+
         // Create spaceFrame to hold spaces
-        spacePanel = new JLayeredPane();
+        spacePanel = new JPanel();
         spacePanel.setPreferredSize(
                 new Dimension(SPACE_SIZE * Board.SIZE, SPACE_SIZE * Board.SIZE)
         );
         spacePanel.setLayout(new GridLayout(3, 3));
-        mainFrame.add(spacePanel, BorderLayout.PAGE_START);
+        gamePanel.add(spacePanel, BorderLayout.PAGE_START);
+
+        // Create a nameField to get the player's names
+        JTextField nameField = new JTextField(6);
+        nameField.setPreferredSize(
+                new Dimension(160, 40)
+        );
+        //mainFrame.add(nameField, BorderLayout.PAGE_START);
 
         // Create infoButton to show information to player,
         // as well as to allow them to have more than 1 game
         infoButton = new JButton();
         infoButton.setPreferredSize(
-                new Dimension(mainFrame.getPreferredSize().width, INFO_BUTTON_HEIGHT)
+                new Dimension(SPACE_SIZE * Board.SIZE, INFO_BUTTON_HEIGHT)
         );
         infoButton.addActionListener(this::onInfoButtonPressed);
-        mainFrame.add(infoButton, BorderLayout.PAGE_END);
+        gamePanel.add(infoButton, BorderLayout.PAGE_END);
+
+        JOptionPane.showMessageDialog(mainFrame, "Hello");
+
+        // Create leaderboard
+        leaderboard = new Leaderboard();
+        leaderboard.setLayout(new BoxLayout(leaderboard, BoxLayout.PAGE_AXIS));
+        leaderboard.setPreferredSize(
+                new Dimension(
+                        LEADERBOARD_WIDTH,
+                        mainFrame.getPreferredSize().height
+                )
+        );
+        mainFrame.add(leaderboard, BorderLayout.LINE_END);
 
         isGameRunning = true;
         resetGame();

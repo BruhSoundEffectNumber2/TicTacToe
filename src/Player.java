@@ -1,6 +1,7 @@
 /** Represents one of the players of the game, and the data that makes them up. */
 public class Player {
     public int id;
+    public String name;
     public int visualID;
     public int timesWon;
 
