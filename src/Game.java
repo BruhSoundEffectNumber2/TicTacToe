@@ -1,13 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 /** Holds all game data and logic. Controls the flow of the game. */
 public class Game implements Runnable {
     public static final int SPACE_SIZE = 200;
     public static final int INFO_BUTTON_HEIGHT = 20;
     public static final int LEADERBOARD_WIDTH = 180;
-    public static final int NAME_FIELD_HEIGHT = 40;
 
     private final Board board;
     private final Player[] players;
@@ -149,6 +149,16 @@ public class Game implements Runnable {
 
         getPlayerName(players[0]);
         getPlayerName(players[1]);
+
+        // Update the player's timesWon to match the leaderboard
+        for (Player player: players) {
+            for (LeaderboardScore score : leaderboard.getScores()) {
+                if (Objects.equals(player.name, score.name)) {
+                    player.timesWon = score.timesWon;
+                }
+            }
+        }
+
         isGameRunning = true;
     }
 
@@ -160,7 +170,11 @@ public class Game implements Runnable {
                 "Enter Your Name"
             );
 
-            if (input != null && input.length() > 0 && input.length() <= 6) {
+            if (input == null) {
+                System.exit(1);
+            }
+
+            if (input.length() > 0 && input.length() <= 6) {
                 p.name = input;
                 break;
             }

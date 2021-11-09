@@ -3,11 +3,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Scanner;
+import java.util.*;
 
 /** Keeps track of and displays leaderboard stats. */
 public class Leaderboard extends JPanel {
@@ -43,31 +39,33 @@ public class Leaderboard extends JPanel {
         } catch (Exception ignored) {}
     }
 
+    public LeaderboardScore[] getScores() {
+        return scores.toArray(new LeaderboardScore[0]);
+    }
+
     public void updateScores(Player[] players) {
         // Update the players score with the leaderboard based on name matching
         for (Player player : players) {
             boolean foundMatch = false;
             for (LeaderboardScore score : scores) {
-                if (player.name == score.name) {
+                if (Objects.equals(player.name, score.name)) {
                     foundMatch = true;
                     score.timesWon = player.timesWon;
                 }
             }
             
-            // If there is no match in our existing leaderboard, then create a new score
-            if (!foundMatch) {
+            /*
+            If there is no match in our existing leaderboard,
+            then create a new score if the player has one more than once.
+             */
+            if (!foundMatch && player.timesWon > 0) {
                 scores.add(new LeaderboardScore(0, player.name, player.timesWon, this));
             }
         }
 
         // Sort the list and change the ranking's to match correctly
-        Collections.sort(scores, new Comparator<LeaderboardScore>() {
-            // Sort list with custom comparator to ensure that the timesWon determines ranking
-            @Override
-            public int compare(LeaderboardScore o1, LeaderboardScore o2) {
-                return Integer.compare(o1.timesWon, o2.timesWon);
-            }
-        });
+        // Sort list with custom comparator to ensure that the timesWon determines ranking
+        scores.sort(Comparator.comparingInt(o -> o.timesWon));
 
         // Reverse the list so the highest ranking will be first in the list
         Collections.reverse(scores);
@@ -77,7 +75,7 @@ public class Leaderboard extends JPanel {
             scores.get(i).ranking = i + 1;
         }
 
-        // Remove and then re-add the scores to the leaderboard so it will display correctly
+        // Remove and then re-add the scores to the leaderboard, so it will display correctly
         for (LeaderboardScore score : scores) {
             remove(score);
         }
@@ -91,11 +89,24 @@ public class Leaderboard extends JPanel {
 
         if (file.exists()) {
             try {
-                PrintWriter writer = new PrintWriter("Leaderboard.txt");
-                
+                // Use the PrintWriter to clear the entire contents of the folder
+                PrintWriter printWriter = new PrintWriter(file);
+                printWriter.print("");
+                printWriter.close();
+
+                FileWriter fileWriter = new FileWriter(file);
+
+                // Add the scores to the file
                 for (LeaderboardScore score : scores) {
-                    writer.print("");
+                    fileWriter.write(String.valueOf(score.ranking));
+                    fileWriter.write(",");
+                    fileWriter.write(score.name);
+                    fileWriter.write(",");
+                    fileWriter.write(String.valueOf(score.timesWon));
+                    fileWriter.write("\n");
                 }
+
+                fileWriter.close();
             } catch (Exception ignored) {}
         }
     }
