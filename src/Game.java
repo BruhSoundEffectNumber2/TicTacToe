@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 
 /** Holds all game data and logic. Controls the flow of the game. */
-public class Game implements Runnable {
+public class Game implements Runnable, Resetable {
     public static final int SPACE_SIZE = 200;
     public static final int INFO_BUTTON_HEIGHT = 20;
     public static final int LEADERBOARD_WIDTH = 180;
@@ -32,7 +32,7 @@ public class Game implements Runnable {
         }
 
         isGameRunning = true;
-        resetGame();
+        reset();
         updateInfoButtonCurrentPlayer();
     }
 
@@ -141,7 +141,7 @@ public class Game implements Runnable {
         );
         mainFrame.add(leaderboard, BorderLayout.LINE_END);
 
-        resetGame();
+        reset();
         updateInfoButtonCurrentPlayer();
 
         mainFrame.pack();
@@ -186,8 +186,8 @@ public class Game implements Runnable {
         infoButton.setText("It is player " + currentPlayer.visualID + "'s turn to act.");
     }
 
-    /** Resets the game. Allows a new game to begin. */
-    private void resetGame() {
+    @Override
+    public void reset() {
         currentPlayer = players[0];
         board.reset(this);
     }
